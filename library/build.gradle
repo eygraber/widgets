@@ -24,7 +24,6 @@ android {
     lintOptions {
         abortOnError false
     }
-    publishNonDefault true
 }
 
 dependencies {
