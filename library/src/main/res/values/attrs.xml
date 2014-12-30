@@ -28,5 +28,6 @@
         <attr name="hbv_confirm_text_color" format="color"/>
         <attr name="hbv_confirm_background" format="integer"/>
         <attr name="hbv_show_confirm" format="boolean"/>
+        <attr name="hbv_remove_on_confirm" format="boolean"/>
     </declare-styleable>
 </resources>

@@ -14,46 +14,6 @@ import android.view.ViewGroup;
  * To change this template use File | Settings | File Templates.
  */
 /*package*/ final class ArrowView extends View {
-    public static enum ArrowGravity {
-        TOP, BOTTOM, START, END;
-
-        public static ArrowGravity get(int value) {
-            switch (value) {
-                case 1:
-                    return TOP;
-                case 2:
-                    return BOTTOM;
-                case 4:
-                    return START;
-                default:
-                    return END;
-            }
-        }
-
-        public boolean isHorizontal() {
-            return this == TOP || this == BOTTOM;
-        }
-
-        public boolean isVertical() {
-            return this == START || this == END;
-        }
-    }
-
-    public static enum ArrowLocation {
-        START, END, CENTER;
-
-        public static ArrowLocation get(int value) {
-            switch (value) {
-                case 1:
-                    return START;
-                case 2:
-                    return END;
-                default:
-                    return CENTER;
-            }
-        }
-    }
-
     private int width;
     private int height;
 
@@ -62,8 +22,8 @@ import android.view.ViewGroup;
 
     private Paint backgroundPaint;
 
-    private ArrowGravity gravity = ArrowGravity.TOP;
-    private ArrowLocation location = ArrowLocation.CENTER;
+    private BubbleView.ArrowGravity gravity = BubbleView.ArrowGravity.TOP;
+    private BubbleView.ArrowLocation location = BubbleView.ArrowLocation.CENTER;
 
     public ArrowView(Context context) {
         super(context);
@@ -110,17 +70,17 @@ import android.view.ViewGroup;
         invalidate();
     }
 
-    public ArrowGravity getGravity() {
+    public BubbleView.ArrowGravity getGravity() {
         return gravity;
     }
 
-    public void setGravity(ArrowGravity gravity) {
+    public void setGravity(BubbleView.ArrowGravity gravity) {
         this.gravity = gravity;
 
         setLocation(location);
     }
 
-    public void setLocation(ArrowLocation location) {
+    public void setLocation(BubbleView.ArrowLocation location) {
         this.location = location;
 
         switch(gravity) {
@@ -137,30 +97,38 @@ import android.view.ViewGroup;
         invalidate();
     }
 
-    public ArrowLocation getLocation() {
+    public BubbleView.ArrowLocation getLocation() {
         return location;
     }
 
     private ViewGroup findSibling() {
         ViewGroup parent = (ViewGroup) getParent();
-        ViewGroup sibling = null;
-        for(int i = 0; i < parent.getChildCount(); i++) {
-            View child = parent.getChildAt(i);
-            if(child != parent && child instanceof ViewGroup) {
-                sibling = (ViewGroup) child;
-                break;
+
+        if(parent != null) {
+            ViewGroup sibling = null;
+            for(int i = 0; i < parent.getChildCount(); i++) {
+                View child = parent.getChildAt(i);
+                if(child != parent && child instanceof ViewGroup) {
+                    sibling = (ViewGroup) child;
+                    break;
+                }
+            }
+
+            if(sibling != null) {
+                return sibling;
             }
         }
 
-        if(sibling == null) {
-            sibling = parent;
-        }
-
-        return sibling;
+        return null;
     }
 
     private void calculateHorizontalOffsets() {
-        int uncleWidth = findSibling().getMeasuredWidth();
+        ViewGroup sibling = findSibling();
+        if(sibling == null) {
+            return;
+        }
+
+        int siblingWidth = sibling.getMeasuredWidth();
 
         switch(location) {
             case START:
@@ -168,18 +136,23 @@ import android.view.ViewGroup;
                 heightOffset = 0;
                 break;
             case CENTER:
-                widthOffset = (uncleWidth / 2) - (width / 2);
+                widthOffset = (siblingWidth / 2) - (width / 2);
                 heightOffset = 0;
                 break;
             case END:
-                widthOffset = uncleWidth - width;
+                widthOffset = siblingWidth - width;
                 heightOffset = 0;
                 break;
         }
     }
 
     private void calculateVerticalOffsets() {
-        int uncleHeight = findSibling().getMeasuredHeight();
+        ViewGroup sibling = findSibling();
+        if(sibling == null) {
+            return;
+        }
+
+        int siblingHeight = sibling.getMeasuredHeight();
 
         switch(location) {
             case START:
@@ -188,11 +161,11 @@ import android.view.ViewGroup;
                 break;
             case CENTER:
                 widthOffset = 0;
-                heightOffset = (uncleHeight / 2) - (height / 2);
+                heightOffset = (siblingHeight / 2) - (height / 2);
                 break;
             case END:
                 widthOffset = 0;
-                heightOffset = uncleHeight - height;
+                heightOffset = siblingHeight - height;
                 break;
         }
     }
@@ -208,6 +181,11 @@ import android.view.ViewGroup;
             case START:
                 calculateVerticalOffsets();
                 break;
+        }
+
+        ViewGroup sibling = findSibling();
+        if(sibling == null) {
+            return;
         }
 
         int measuredWidth = gravity.isHorizontal() ? findSibling().getMeasuredWidth() : width;

@@ -28,10 +28,53 @@ public final class BubbleView extends LinearLayout {
     private static final int DEFAULT_ARROW_LOCATION = 4;
     private static final int DEFAULT_TEXT_COLOR = Color.BLACK;
 
+    public static enum ArrowGravity {
+        TOP, BOTTOM, START, END;
+
+        public static ArrowGravity get(int value) {
+            switch (value) {
+                case 1:
+                    return TOP;
+                case 2:
+                    return BOTTOM;
+                case 4:
+                    return START;
+                default:
+                    return END;
+            }
+        }
+
+        public boolean isHorizontal() {
+            return this == TOP || this == BOTTOM;
+        }
+
+        public boolean isVertical() {
+            return this == START || this == END;
+        }
+    }
+
+    public static enum ArrowLocation {
+        START, END, CENTER;
+
+        public static ArrowLocation get(int value) {
+            switch (value) {
+                case 1:
+                    return START;
+                case 2:
+                    return END;
+                default:
+                    return CENTER;
+            }
+        }
+    }
+
+    private LinearLayout container;
     private TextView titleView;
     private TextView textView;
     private Button confirmView;
     private OnClickListener confirmClickListener;
+
+    private boolean removeOnConfirm;
 
     private ArrowView arrowView;
 
@@ -55,7 +98,7 @@ public final class BubbleView extends LinearLayout {
     private void init(AttributeSet attrs) {
         LayoutInflater.from(getContext()).inflate(R.layout.bubble_view, this, true);
 
-        LinearLayout container = (LinearLayout) findViewById(R.id.help_bubble_container);
+        container = (LinearLayout) findViewById(R.id.help_bubble_container);
         titleView = (TextView) findViewById(R.id.help_bubble_title);
         textView = (TextView) findViewById(R.id.help_bubble_text);
         confirmView = (Button) findViewById(R.id.help_bubble_confirm);
@@ -65,8 +108,8 @@ public final class BubbleView extends LinearLayout {
         int arrowWidth = DEFAULT_ARROW_MEASUREMENT;
         int arrowHeight = DEFAULT_ARROW_MEASUREMENT;
 
-        ArrowView.ArrowGravity arrowGravity = ArrowView.ArrowGravity.TOP;
-        ArrowView.ArrowLocation arrowLocation = ArrowView.ArrowLocation.CENTER;
+        ArrowGravity arrowGravity = ArrowGravity.TOP;
+        ArrowLocation arrowLocation = ArrowLocation.CENTER;
 
         int backgroundColor = Color.WHITE;
 
@@ -93,8 +136,8 @@ public final class BubbleView extends LinearLayout {
             arrowWidth = (int) a.getDimension(R.styleable.BubbleView_hbv_arrow_width, DEFAULT_ARROW_MEASUREMENT);
             arrowHeight = (int) a.getDimension(R.styleable.BubbleView_hbv_arrow_height, DEFAULT_ARROW_MEASUREMENT);
 
-            arrowGravity = ArrowView.ArrowGravity.get(a.getInt(R.styleable.BubbleView_hbv_arrow_gravity, DEFAULT_ARROW_GRAVITY));
-            arrowLocation = ArrowView.ArrowLocation.get(a.getInt(R.styleable.BubbleView_hbv_arrow_location, DEFAULT_ARROW_LOCATION));
+            arrowGravity = ArrowGravity.get(a.getInt(R.styleable.BubbleView_hbv_arrow_gravity, DEFAULT_ARROW_GRAVITY));
+            arrowLocation = ArrowLocation.get(a.getInt(R.styleable.BubbleView_hbv_arrow_location, DEFAULT_ARROW_LOCATION));
 
             title = a.getText(R.styleable.BubbleView_hbv_title);
             titleColor = a.getColor(R.styleable.BubbleView_hbv_title_color, DEFAULT_TEXT_COLOR);
@@ -107,6 +150,8 @@ public final class BubbleView extends LinearLayout {
             confirmBackground = a.getDrawable(R.styleable.BubbleView_hbv_confirm_background);
 
             showConfirm = a.getBoolean(R.styleable.BubbleView_hbv_show_confirm, true);
+
+            removeOnConfirm = a.getBoolean(R.styleable.BubbleView_hbv_remove_on_confirm, true);
 
             a.recycle();
         }
@@ -133,7 +178,9 @@ public final class BubbleView extends LinearLayout {
         confirmView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((ViewGroup) getParent()).removeView(BubbleView.this);
+                if(removeOnConfirm) {
+                    ((ViewGroup) getParent()).removeView(BubbleView.this);
+                }
 
                 if(BubbleView.this.confirmClickListener != null) {
                     BubbleView.this.confirmClickListener.onClick(v);
@@ -168,11 +215,11 @@ public final class BubbleView extends LinearLayout {
         arrowView.invalidate();
     }
 
-    public ArrowView.ArrowGravity getArrowGravity() {
+    public ArrowGravity getArrowGravity() {
         return arrowView.getGravity();
     }
 
-    public void setArrowGravity(ArrowView.ArrowGravity arrowGravity) {
+    public void setArrowGravity(ArrowGravity arrowGravity) {
         removeView(arrowView);
 
         switch(arrowGravity) {
@@ -187,21 +234,34 @@ public final class BubbleView extends LinearLayout {
             case START:
                 setOrientation(HORIZONTAL);
                 addView(arrowView, 0);
+                measure(1, 1);
                 break;
             case END:
                 setOrientation(HORIZONTAL);
                 addView(arrowView, 1);
+                measure(1, 1);
                 break;
         }
+
+        setLayoutParamsAfterSettingGravity(.9f, .1f);
 
         arrowView.setGravity(arrowGravity);
     }
 
-    public ArrowView.ArrowLocation getArrowLocation() {
+    private void setLayoutParamsAfterSettingGravity(float containerWeight, float arrowWeight) {
+        LayoutParams containerLp = (LayoutParams) container.getLayoutParams();
+        LayoutParams arrowLp = (LayoutParams) arrowView.getLayoutParams();
+        containerLp.weight = containerWeight;
+        arrowLp.weight = arrowWeight;
+        container.setLayoutParams(containerLp);
+        arrowView.setLayoutParams(arrowLp);
+    }
+
+    public ArrowLocation getArrowLocation() {
         return arrowView.getLocation();
     }
 
-    public void setArrowLocation(ArrowView.ArrowLocation arrowLocation) {
+    public void setArrowLocation(ArrowLocation arrowLocation) {
         arrowView.setLocation(arrowLocation);
     }
 
@@ -289,5 +349,13 @@ public final class BubbleView extends LinearLayout {
         } else {
             confirmView.setBackgroundDrawable(background);
         }
+    }
+
+    public boolean isRemoveOnConfirm() {
+        return removeOnConfirm;
+    }
+
+    public void setRemoveOnConfirm(boolean removeOnConfirm) {
+        this.removeOnConfirm = removeOnConfirm;
     }
 }
