@@ -1,6 +1,5 @@
 package com.staticbloc.widgets;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -342,9 +341,8 @@ public final class BubbleView extends LinearLayout {
         return confirmView.getBackground();
     }
 
-    @SuppressLint("NewApi")
     public void setConfirmBackground(Drawable background) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             confirmView.setBackground(background);
         } else {
             confirmView.setBackgroundDrawable(background);
