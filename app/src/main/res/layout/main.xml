@@ -11,9 +11,10 @@
         android:layout_height="wrap_content"
         app:bv_content="@layout/bubble_content"
         app:bv_background_color="#999"
-        app:bv_arrow_color="#f00"
-        app:bv_arrow_width="20dp"
-        app:bv_arrow_height="7.5dp"
-        app:bv_arrow_gravity="start"/>
+        app:bv_decoration_color="#f00"
+        app:bv_decoration_width="20dp"
+        app:bv_decoration_height="7.5dp"
+        app:bv_decoration_gravity="bottom"
+        app:bv_decoration_location="center"/>
 
 </LinearLayout>

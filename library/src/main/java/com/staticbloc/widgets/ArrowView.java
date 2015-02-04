@@ -2,9 +2,7 @@ package com.staticbloc.widgets;
 
 import android.content.Context;
 import android.graphics.*;
-import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,91 +11,39 @@ import android.view.ViewGroup;
  * Time: 4:47 AM
  * To change this template use File | Settings | File Templates.
  */
-/*package*/ final class ArrowView extends View {
-    private int width;
-    private int height;
-
+/*package*/ final class ArrowView extends BubbleView.Decoration {
     private int widthOffset = 0;
     private int heightOffset = 0;
 
-    private int arrowStartMargin = 0;
-    private int arrowEndMargin = 0;
-
-    private Paint backgroundPaint;
-
-    private BubbleView.ArrowGravity gravity = BubbleView.ArrowGravity.TOP;
-    private BubbleView.ArrowLocation location = BubbleView.ArrowLocation.CENTER;
-
     public ArrowView(Context context) {
         super(context);
-        init();
-    }
 
-    public ArrowView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    public ArrowView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init();
-    }
-
-    private void init() {
         setBackgroundColor(Color.TRANSPARENT);
-        backgroundPaint = new Paint();
+        setDecorationColor(Color.WHITE);
     }
 
-    public int getArrowWidth() {
-        return width;
+    @Override
+    protected void onGravityChanged() {
+        onLocationChanged();
     }
 
-    public int getArrowHeight() {
-        return height;
+    @Override
+    protected void onLocationChanged() {
+        switch(getGravity()) {
+            case TOP:
+            case BOTTOM:
+                calculateHorizontalOffsets();
+                break;
+            case END:
+            case START:
+                calculateVerticalOffsets();
+                break;
+        }
     }
 
-    public void setArrowDimensions(int width, int height) {
-        this.width = width;
-        this.height = height;
-
-        invalidate();
-    }
-
-    public int getArrowStartMargin() {
-        return arrowStartMargin;
-    }
-
-    public int getArrowEndMargin() {
-        return arrowEndMargin;
-    }
-
-    public void setArrowMargins(int arrowStartMargin, int arrowEndMargin) {
-        this.arrowStartMargin = arrowStartMargin;
-        this.arrowEndMargin = arrowEndMargin;
-    }
-
-    public int getColor() {
-        return backgroundPaint.getColor();
-    }
-
-    public void setColor(int color) {
-        this.backgroundPaint.setColor(color);
-
-        invalidate();
-    }
-
-    public BubbleView.ArrowGravity getGravity() {
-        return gravity;
-    }
-
-    public void setGravity(BubbleView.ArrowGravity gravity) {
-        this.gravity = gravity;
-
-        setLocation(location);
-    }
-
-    public void setLocation(BubbleView.ArrowLocation location) {
-        this.location = location;
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        DecorationGravity gravity = getGravity();
 
         switch(gravity) {
             case TOP:
@@ -110,26 +56,26 @@ import android.view.ViewGroup;
                 break;
         }
 
+        View sibling = findSibling();
+        if(sibling == null) {
+            return;
+        }
+
+        int measuredWidth = gravity.isHorizontal() ? findSibling().getMeasuredWidth() : getDecoWidth();
+        int measuredHeight = gravity.isVertical() ? findSibling().getMeasuredHeight() : getDecoHeight();
+
+        setMeasuredDimension(measuredWidth, measuredHeight);
+
         invalidate();
     }
 
-    public BubbleView.ArrowLocation getLocation() {
-        return location;
+    @Override
+    public void drawDecoration(Canvas canvas) {
+        drawArrow(canvas);
     }
 
     private View findSibling() {
-        ViewGroup parent = (ViewGroup) getParent();
-
-        if(parent != null) {
-            for(int i = 0; i < parent.getChildCount(); i++) {
-                View child = parent.getChildAt(i);
-                if(child != null && child != parent && child != this) {
-                    return child;
-                }
-            }
-        }
-
-        return null;
+        return ((View) getParent()).findViewById(R.id.bv_content);
     }
 
     private void calculateHorizontalOffsets() {
@@ -140,17 +86,17 @@ import android.view.ViewGroup;
 
         int siblingWidth = sibling.getMeasuredWidth();
 
-        switch(location) {
+        switch(getLocation()) {
             case START:
                 widthOffset = 0;
                 heightOffset = 0;
                 break;
             case CENTER:
-                widthOffset = (siblingWidth / 2) - (width / 2);
+                widthOffset = (siblingWidth / 2) - (getDecoWidth() / 2);
                 heightOffset = 0;
                 break;
             case END:
-                widthOffset = siblingWidth - width;
+                widthOffset = siblingWidth - getDecoWidth();
                 heightOffset = 0;
                 break;
         }
@@ -164,78 +110,45 @@ import android.view.ViewGroup;
 
         int siblingHeight = sibling.getMeasuredHeight();
 
-        switch(location) {
+        switch(getLocation()) {
             case START:
                 widthOffset = 0;
                 heightOffset = 0;
                 break;
             case CENTER:
                 widthOffset = 0;
-                heightOffset = (siblingHeight / 2) - (height / 2);
+                heightOffset = (siblingHeight / 2) - (getDecoHeight() / 2);
                 break;
             case END:
                 widthOffset = 0;
-                heightOffset = siblingHeight - height;
+                heightOffset = siblingHeight - getDecoHeight();
                 break;
         }
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        switch(gravity) {
-            case TOP:
-            case BOTTOM:
-                calculateHorizontalOffsets();
-                break;
-            case END:
-            case START:
-                calculateVerticalOffsets();
-                break;
-        }
-
-        View sibling = findSibling();
-        if(sibling == null) {
-            return;
-        }
-
-        int measuredWidth = gravity.isHorizontal() ? findSibling().getMeasuredWidth() : width;
-        int measuredHeight = gravity.isVertical() ? findSibling().getMeasuredHeight() : height;
-
-        setMeasuredDimension(measuredWidth, measuredHeight);
-
-        invalidate();
-    }
-
-    @Override
-    public void draw(Canvas canvas) {
-        super.draw(canvas);
-
-        drawArrow(canvas);
     }
 
     private void drawArrow(Canvas canvas) {
-        switch(gravity) {
+        switch(getGravity()) {
             case TOP:
-                canvas.drawPath(getTopArrowPath(), backgroundPaint);
+                canvas.drawPath(getTopArrowPath(), getPaint());
                 break;
             case END:
-                canvas.drawPath(getEndArrowPath(), backgroundPaint);
+                canvas.drawPath(getEndArrowPath(), getPaint());
                 break;
             case BOTTOM:
-                canvas.drawPath(getBottomArrowPath(), backgroundPaint);
+                canvas.drawPath(getBottomArrowPath(), getPaint());
                 break;
             case START:
-                canvas.drawPath(getStartArrowPath(), backgroundPaint);
+                canvas.drawPath(getStartArrowPath(), getPaint());
                 break;
         }
     }
 
     private Path getPath(float rotation, float pivotX, float pivotY, float postRotateTranslationX, float postRotateTranslationY) {
-        int widthEnd = widthOffset + width;
-        int heightEnd = heightOffset + height;
+        int widthEnd = widthOffset + getDecoWidth();
+        int heightEnd = heightOffset + getDecoHeight();
 
         Point a = new Point(widthOffset, heightOffset);
-        Point b = new Point(((width / 2) + widthOffset), heightEnd);
+        Point b = new Point(((getDecoWidth() / 2) + widthOffset), heightEnd);
         Point c = new Point(widthEnd, heightOffset);
         Point d = new Point(widthOffset, heightOffset);
 
@@ -249,11 +162,11 @@ import android.view.ViewGroup;
         RectF bounds = new RectF();
         path.computeBounds(bounds, true);
         mMatrix.postRotate(rotation, pivotX, pivotY);
-        if(gravity.isHorizontal()) {
-            postRotateTranslationX += arrowStartMargin - arrowEndMargin;
+        if(getGravity().isHorizontal()) {
+            postRotateTranslationX += getStartMargin() - getEndMargin();
         }
         else {
-          postRotateTranslationY += arrowStartMargin - arrowEndMargin;
+          postRotateTranslationY += getStartMargin() - getEndMargin();
         }
         mMatrix.postTranslate(postRotateTranslationX, postRotateTranslationY);
         path.transform(mMatrix);
@@ -262,19 +175,19 @@ import android.view.ViewGroup;
     }
 
     private Path getTopArrowPath() {
-        return getPath(180, widthOffset + (width / 2), height / 2, 0, 0);
+        return getPath(180, widthOffset + (getDecoWidth() / 2), getDecoHeight() / 2, 0, 0);
     }
 
     private Path getEndArrowPath() {
-        return getPath(270, 0, heightOffset, 0, (height / 2) + (width / 2));
+        return getPath(270, 0, heightOffset, 0, (getDecoHeight() / 2) + (getDecoWidth() / 2));
     }
 
     private Path getBottomArrowPath() {
-        return getPath(0, widthOffset + (width / 2), height / 2, 0, 0);
+        return getPath(0, widthOffset + (getDecoWidth() / 2), getDecoHeight() / 2, 0, 0);
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
     private Path getStartArrowPath() {
-        return getPath(90, width, heightOffset, 0, (height / 2) + (width / 2));
+        return getPath(90, getDecoWidth(), heightOffset, 0, (getDecoHeight() / 2) + (getDecoWidth() / 2));
     }
 }

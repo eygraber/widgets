@@ -5,23 +5,24 @@
     </declare-styleable>
 
     <declare-styleable name="BubbleView">
-        <attr name="bv_arrow_width" format="dimension"/>
-        <attr name="bv_arrow_height" format="dimension"/>
+        <attr name="bv_decoration" format="string"/>
+        <attr name="bv_decoration_width" format="dimension"/>
+        <attr name="bv_decoration_height" format="dimension"/>
         <attr name="bv_background_color" format="color"/>
-        <attr name="bv_arrow_color" format="color"/>
-        <attr name="bv_arrow_gravity" format="enum">
+        <attr name="bv_decoration_color" format="color"/>
+        <attr name="bv_decoration_gravity" format="enum">
             <enum name="top" value="1"/>
             <enum name="bottom" value="2"/>
             <enum name="start" value="4"/>
             <enum name="end" value="8"/>
         </attr>
-        <attr name="bv_arrow_location" format="enum">
+        <attr name="bv_decoration_location" format="enum">
             <enum name="start" value="1"/>
             <enum name="end" value="2"/>
             <enum name="center" value="4"/>
         </attr>
-        <attr name="bv_arrow_margin_start" format="dimension"/>
-        <attr name="bv_arrow_margin_end" format="dimension"/>
+        <attr name="bv_decoration_margin_start" format="dimension"/>
+        <attr name="bv_decoration_margin_end" format="dimension"/>
         <attr name="bv_content" format="reference"/>
     </declare-styleable>
 </resources>
