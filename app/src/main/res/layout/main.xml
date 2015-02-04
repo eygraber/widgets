@@ -14,6 +14,6 @@
         app:bv_arrow_color="#f00"
         app:bv_arrow_width="20dp"
         app:bv_arrow_height="7.5dp"
-        app:bv_arrow_gravity="end"/>
+        app:bv_arrow_gravity="start"/>
 
 </LinearLayout>

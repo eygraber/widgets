@@ -20,6 +20,8 @@
             <enum name="end" value="2"/>
             <enum name="center" value="4"/>
         </attr>
+        <attr name="bv_arrow_margin_start" format="dimension"/>
+        <attr name="bv_arrow_margin_end" format="dimension"/>
         <attr name="bv_content" format="reference"/>
     </declare-styleable>
 </resources>

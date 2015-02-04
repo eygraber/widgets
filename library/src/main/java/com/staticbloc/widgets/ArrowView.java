@@ -20,6 +20,9 @@ import android.view.ViewGroup;
     private int widthOffset = 0;
     private int heightOffset = 0;
 
+    private int arrowStartMargin = 0;
+    private int arrowEndMargin = 0;
+
     private Paint backgroundPaint;
 
     private BubbleView.ArrowGravity gravity = BubbleView.ArrowGravity.TOP;
@@ -58,6 +61,19 @@ import android.view.ViewGroup;
         this.height = height;
 
         invalidate();
+    }
+
+    public int getArrowStartMargin() {
+        return arrowStartMargin;
+    }
+
+    public int getArrowEndMargin() {
+        return arrowEndMargin;
+    }
+
+    public void setArrowMargins(int arrowStartMargin, int arrowEndMargin) {
+        this.arrowStartMargin = arrowStartMargin;
+        this.arrowEndMargin = arrowEndMargin;
     }
 
     public int getColor() {
@@ -233,7 +249,13 @@ import android.view.ViewGroup;
         RectF bounds = new RectF();
         path.computeBounds(bounds, true);
         mMatrix.postRotate(rotation, pivotX, pivotY);
-        mMatrix.postTranslate(postRotateTranslationX, postRotateTranslationY) ;
+        if(gravity.isHorizontal()) {
+            postRotateTranslationX += arrowStartMargin - arrowEndMargin;
+        }
+        else {
+          postRotateTranslationY += arrowStartMargin - arrowEndMargin;
+        }
+        mMatrix.postTranslate(postRotateTranslationX, postRotateTranslationY);
         path.transform(mMatrix);
 
         return path;
@@ -253,6 +275,6 @@ import android.view.ViewGroup;
 
     @SuppressWarnings("SuspiciousNameCombination")
     private Path getStartArrowPath() {
-        return getPath(90, height, heightOffset, 0, (height / 2) + (width / 2));
+        return getPath(90, width, heightOffset, 0, (height / 2) + (width / 2));
     }
 }

@@ -91,6 +91,9 @@ public final class BubbleView extends LinearLayout {
         int arrowWidth = DEFAULT_ARROW_MEASUREMENT;
         int arrowHeight = DEFAULT_ARROW_MEASUREMENT;
 
+        int arrowStartMargin = 0;
+        int arrowEndMargin = 0;
+
         ArrowGravity arrowGravity = ArrowGravity.TOP;
         ArrowLocation arrowLocation = ArrowLocation.CENTER;
 
@@ -124,6 +127,9 @@ public final class BubbleView extends LinearLayout {
             arrowWidth = (int) a.getDimension(R.styleable.BubbleView_bv_arrow_width, DEFAULT_ARROW_MEASUREMENT);
             arrowHeight = (int) a.getDimension(R.styleable.BubbleView_bv_arrow_height, DEFAULT_ARROW_MEASUREMENT);
 
+            arrowStartMargin = (int) a.getDimension(R.styleable.BubbleView_bv_arrow_margin_start, 0);
+            arrowEndMargin = (int) a.getDimension(R.styleable.BubbleView_bv_arrow_margin_end, 0);
+
             arrowGravity = ArrowGravity.get(a.getInt(R.styleable.BubbleView_bv_arrow_gravity, DEFAULT_ARROW_GRAVITY));
             arrowLocation = ArrowLocation.get(a.getInt(R.styleable.BubbleView_bv_arrow_location, DEFAULT_ARROW_LOCATION));
 
@@ -133,6 +139,7 @@ public final class BubbleView extends LinearLayout {
         arrowView = new ArrowView(getContext());
         arrowView.setColor(arrowColor);
         arrowView.setArrowDimensions(arrowWidth, arrowHeight);
+        arrowView.setArrowMargins(arrowStartMargin, arrowEndMargin);
         setArrowGravity(arrowGravity);
         setArrowLocation(arrowLocation);
 
@@ -149,6 +156,20 @@ public final class BubbleView extends LinearLayout {
 
     public void setArrowDimensions(int width, int height) {
         arrowView.setArrowDimensions(width, height);
+        arrowView.invalidate();
+    }
+
+    public int getArrowStartMargin() {
+        return arrowView.getArrowStartMargin();
+    }
+
+    public int getArrowEndMargin() {
+      return arrowView.getArrowEndMargin();
+    }
+
+    public void setArrowMargins(int arrowStartMargin, int arrowEndMargin) {
+        arrowView.setArrowMargins(arrowStartMargin, arrowEndMargin);
+        arrowView.invalidate();
     }
 
     public int getArrowColor() {
