@@ -4,15 +4,11 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
+import android.view.ViewStub;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,7 +21,6 @@ public final class BubbleView extends LinearLayout {
     private static final int DEFAULT_ARROW_MEASUREMENT = 50;
     private static final int DEFAULT_ARROW_GRAVITY = 1;
     private static final int DEFAULT_ARROW_LOCATION = 4;
-    private static final int DEFAULT_TEXT_COLOR = Color.BLACK;
 
     public static enum ArrowGravity {
         TOP, BOTTOM, START, END;
@@ -67,13 +62,7 @@ public final class BubbleView extends LinearLayout {
         }
     }
 
-    private LinearLayout container;
-    private TextView titleView;
-    private TextView textView;
-    private Button confirmView;
-    private OnClickListener confirmClickListener;
-
-    private boolean removeOnConfirm;
+    private View container;
 
     private ArrowView arrowView;
 
@@ -97,11 +86,6 @@ public final class BubbleView extends LinearLayout {
     private void init(AttributeSet attrs) {
         LayoutInflater.from(getContext()).inflate(R.layout.bubble_view, this, true);
 
-        container = (LinearLayout) findViewById(R.id.help_bubble_container);
-        titleView = (TextView) findViewById(R.id.help_bubble_title);
-        textView = (TextView) findViewById(R.id.help_bubble_text);
-        confirmView = (Button) findViewById(R.id.help_bubble_confirm);
-
         arrowBackgroundPaint = new Paint();
 
         int arrowWidth = DEFAULT_ARROW_MEASUREMENT;
@@ -111,86 +95,48 @@ public final class BubbleView extends LinearLayout {
         ArrowLocation arrowLocation = ArrowLocation.CENTER;
 
         int backgroundColor = Color.WHITE;
-
-        CharSequence title = null;
-        int titleColor = DEFAULT_TEXT_COLOR;
-
-        CharSequence text = null;
-        int textColor = DEFAULT_TEXT_COLOR;
-
-        int confirmTextColor = DEFAULT_TEXT_COLOR;
-        CharSequence confirmText = null;
-        boolean showConfirm = true;
-        Drawable confirmBackground = null;
+        int arrowColor = Color.WHITE;
 
         if (attrs != null) {
             TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.BubbleView);
 
-            backgroundColor = a.getColor(R.styleable.BubbleView_hbv_background_color, -1);
+            ViewStub contentStub = (ViewStub) findViewById(R.id.content_stub);
+            int contentResource = a.getResourceId(R.styleable.BubbleView_bv_content, -1);
+            if(contentResource != -1) {
+                contentStub.setLayoutResource(contentResource);
+                container = contentStub.inflate();
+            }
+            else {
+                container = contentStub;
+            }
+
+            backgroundColor = a.getColor(R.styleable.BubbleView_bv_background_color, -1);
             if (backgroundColor == -1) {
                 backgroundColor = Color.WHITE;
             }
             container.setBackgroundColor(backgroundColor);
 
-            arrowWidth = (int) a.getDimension(R.styleable.BubbleView_hbv_arrow_width, DEFAULT_ARROW_MEASUREMENT);
-            arrowHeight = (int) a.getDimension(R.styleable.BubbleView_hbv_arrow_height, DEFAULT_ARROW_MEASUREMENT);
+            arrowColor = a.getColor(R.styleable.BubbleView_bv_arrow_color, -1);
+            if(arrowColor == -1) {
+                arrowColor = backgroundColor;
+            }
 
-            arrowGravity = ArrowGravity.get(a.getInt(R.styleable.BubbleView_hbv_arrow_gravity, DEFAULT_ARROW_GRAVITY));
-            arrowLocation = ArrowLocation.get(a.getInt(R.styleable.BubbleView_hbv_arrow_location, DEFAULT_ARROW_LOCATION));
+            arrowWidth = (int) a.getDimension(R.styleable.BubbleView_bv_arrow_width, DEFAULT_ARROW_MEASUREMENT);
+            arrowHeight = (int) a.getDimension(R.styleable.BubbleView_bv_arrow_height, DEFAULT_ARROW_MEASUREMENT);
 
-            title = a.getText(R.styleable.BubbleView_hbv_title);
-            titleColor = a.getColor(R.styleable.BubbleView_hbv_title_color, DEFAULT_TEXT_COLOR);
-
-            text = a.getText(R.styleable.BubbleView_hbv_text);
-            textColor = a.getColor(R.styleable.BubbleView_hbv_text_color, DEFAULT_TEXT_COLOR);
-
-            confirmText = a.getText(R.styleable.BubbleView_hbv_confirm_text);
-            confirmTextColor = a.getColor(R.styleable.BubbleView_hbv_confirm_text_color, DEFAULT_TEXT_COLOR);
-            confirmBackground = a.getDrawable(R.styleable.BubbleView_hbv_confirm_background);
-
-            showConfirm = a.getBoolean(R.styleable.BubbleView_hbv_show_confirm, true);
-
-            removeOnConfirm = a.getBoolean(R.styleable.BubbleView_hbv_remove_on_confirm, true);
+            arrowGravity = ArrowGravity.get(a.getInt(R.styleable.BubbleView_bv_arrow_gravity, DEFAULT_ARROW_GRAVITY));
+            arrowLocation = ArrowLocation.get(a.getInt(R.styleable.BubbleView_bv_arrow_location, DEFAULT_ARROW_LOCATION));
 
             a.recycle();
         }
 
-        setTitle(title);
-        setTitleColor(titleColor);
-
-        setText(text);
-        setTextColor(textColor);
-
-        setConfirmText(confirmText);
-        setConfirmTextColor(confirmTextColor);
-        showConfirmButton(showConfirm);
-        setConfirmBackground(confirmBackground);
-
         arrowView = new ArrowView(getContext());
-        arrowView.setColor(backgroundColor);
+        arrowView.setColor(arrowColor);
         arrowView.setArrowDimensions(arrowWidth, arrowHeight);
         setArrowGravity(arrowGravity);
         setArrowLocation(arrowLocation);
 
         setBackgroundColor(Color.TRANSPARENT);
-
-        confirmView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(removeOnConfirm) {
-                    ((ViewGroup) getParent()).removeView(BubbleView.this);
-                }
-
-                if(BubbleView.this.confirmClickListener != null) {
-                    BubbleView.this.confirmClickListener.onClick(v);
-                    BubbleView.this.confirmClickListener = null;
-                }
-            }
-        });
-    }
-
-    public void setOnConfirmClickListener(final OnClickListener confirmClickListener) {
-        this.confirmClickListener = confirmClickListener;
     }
 
     public int getArrowWidth() {
@@ -264,96 +210,15 @@ public final class BubbleView extends LinearLayout {
         arrowView.setLocation(arrowLocation);
     }
 
-    public CharSequence getTitle() {
-        return titleView.getText();
-    }
-
-    public void setTitle(int titleRes) {
-        titleView.setText(titleRes);
-    }
-
-    public void setTitle(CharSequence title) {
-        titleView.setText(title);
-    }
-
-    public int getTitleColor() {
-        return titleView.getCurrentTextColor();
-    }
-
-    public void setTitleColor(int color) {
-        titleView.setTextColor(color);
-    }
-
-    public CharSequence getText() {
-        return textView.getText();
-    }
-
-    public void setText(int textRes) {
-        textView.setText(textRes);
-    }
-
-    public void setText(CharSequence text) {
-        textView.setText(text);
-    }
-
-    public int getTextColor() {
-        return textView.getCurrentTextColor();
-    }
-
-    public void setTextColor(int color) {
-        textView.setTextColor(color);
-    }
-
-    public CharSequence getConfirmText() {
-        return confirmView.getText();
-    }
-
-    public void setConfirmText(int confirmTextRes) {
-        confirmView.setText(confirmTextRes);
-    }
-
-    public void setConfirmText(CharSequence confirmText) {
-        confirmView.setText(confirmText);
-    }
-
-    public int getConfirmTextColor() {
-        return confirmView.getCurrentTextColor();
-    }
-
-    public void setConfirmTextColor(int color) {
-        confirmView.setTextColor(color);
-    }
-
-    public boolean isConfirmButtonShowing() {
-        return confirmView.getVisibility() == View.VISIBLE;
-    }
-
-    public void showConfirmButton(boolean showConfirmView) {
-        if(showConfirmView) {
-            confirmView.setVisibility(View.VISIBLE);
-        }
-        else {
-            confirmView.setVisibility(View.GONE);
-        }
-    }
-
-    public Drawable getConfirmBackground() {
-        return confirmView.getBackground();
-    }
-
-    public void setConfirmBackground(Drawable background) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            confirmView.setBackground(background);
-        } else {
-            confirmView.setBackgroundDrawable(background);
-        }
-    }
-
-    public boolean isRemoveOnConfirm() {
-        return removeOnConfirm;
-    }
-
-    public void setRemoveOnConfirm(boolean removeOnConfirm) {
-        this.removeOnConfirm = removeOnConfirm;
-    }
+//  for testing purposes
+//    @Override
+//    public void draw(Canvas canvas) {
+//        super.draw(canvas);
+//
+//        Paint red = new Paint();
+//        red.setColor(Color.RED);
+//
+//        canvas.drawLine(0, getMeasuredHeight() / 2, getMeasuredWidth(), getMeasuredHeight() / 2, red);
+//        canvas.drawLine(getMeasuredWidth() / 2, 0, getMeasuredWidth() / 2, getMeasuredHeight(), red);
+//    }
 }

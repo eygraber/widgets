@@ -5,29 +5,21 @@
     </declare-styleable>
 
     <declare-styleable name="BubbleView">
-        <attr name="hbv_arrow_width" format="dimension"/>
-        <attr name="hbv_arrow_height" format="dimension"/>
-        <attr name="hbv_background_color" format="color"/>
-        <attr name="android:background"/>
-        <attr name="hbv_arrow_gravity" format="enum">
+        <attr name="bv_arrow_width" format="dimension"/>
+        <attr name="bv_arrow_height" format="dimension"/>
+        <attr name="bv_background_color" format="color"/>
+        <attr name="bv_arrow_color" format="color"/>
+        <attr name="bv_arrow_gravity" format="enum">
             <enum name="top" value="1"/>
             <enum name="bottom" value="2"/>
             <enum name="start" value="4"/>
             <enum name="end" value="8"/>
         </attr>
-        <attr name="hbv_arrow_location" format="enum">
+        <attr name="bv_arrow_location" format="enum">
             <enum name="start" value="1"/>
             <enum name="end" value="2"/>
             <enum name="center" value="4"/>
         </attr>
-        <attr name="hbv_title" format="string"/>
-        <attr name="hbv_title_color" format="color"/>
-        <attr name="hbv_text" format="string"/>
-        <attr name="hbv_text_color" format="color"/>
-        <attr name="hbv_confirm_text" format="string"/>
-        <attr name="hbv_confirm_text_color" format="color"/>
-        <attr name="hbv_confirm_background" format="integer"/>
-        <attr name="hbv_show_confirm" format="boolean"/>
-        <attr name="hbv_remove_on_confirm" format="boolean"/>
+        <attr name="bv_content" format="reference"/>
     </declare-styleable>
 </resources>

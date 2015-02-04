@@ -101,21 +101,15 @@ import android.view.ViewGroup;
         return location;
     }
 
-    private ViewGroup findSibling() {
+    private View findSibling() {
         ViewGroup parent = (ViewGroup) getParent();
 
         if(parent != null) {
-            ViewGroup sibling = null;
             for(int i = 0; i < parent.getChildCount(); i++) {
                 View child = parent.getChildAt(i);
-                if(child != parent && child instanceof ViewGroup) {
-                    sibling = (ViewGroup) child;
-                    break;
+                if(child != null && child != parent && child != this) {
+                    return child;
                 }
-            }
-
-            if(sibling != null) {
-                return sibling;
             }
         }
 
@@ -123,7 +117,7 @@ import android.view.ViewGroup;
     }
 
     private void calculateHorizontalOffsets() {
-        ViewGroup sibling = findSibling();
+        View sibling = findSibling();
         if(sibling == null) {
             return;
         }
@@ -147,7 +141,7 @@ import android.view.ViewGroup;
     }
 
     private void calculateVerticalOffsets() {
-        ViewGroup sibling = findSibling();
+        View sibling = findSibling();
         if(sibling == null) {
             return;
         }
@@ -183,7 +177,7 @@ import android.view.ViewGroup;
                 break;
         }
 
-        ViewGroup sibling = findSibling();
+        View sibling = findSibling();
         if(sibling == null) {
             return;
         }
@@ -220,7 +214,7 @@ import android.view.ViewGroup;
         }
     }
 
-    private Path getPath(float rotation) {
+    private Path getPath(float rotation, float pivotX, float pivotY, float postRotateTranslationX, float postRotateTranslationY) {
         int widthEnd = widthOffset + width;
         int heightEnd = heightOffset + height;
 
@@ -238,27 +232,27 @@ import android.view.ViewGroup;
         Matrix mMatrix = new Matrix();
         RectF bounds = new RectF();
         path.computeBounds(bounds, true);
-        mMatrix.postRotate(rotation,
-                (bounds.right + bounds.left) / 2,
-                (bounds.bottom + bounds.top) / 2);
+        mMatrix.postRotate(rotation, pivotX, pivotY);
+        mMatrix.postTranslate(postRotateTranslationX, postRotateTranslationY) ;
         path.transform(mMatrix);
 
         return path;
     }
 
     private Path getTopArrowPath() {
-        return getPath(180);
+        return getPath(180, widthOffset + (width / 2), height / 2, 0, 0);
     }
 
     private Path getEndArrowPath() {
-        return getPath(270);
+        return getPath(270, 0, heightOffset, 0, (height / 2) + (width / 2));
     }
 
     private Path getBottomArrowPath() {
-        return getPath(0);
+        return getPath(0, widthOffset + (width / 2), height / 2, 0, 0);
     }
 
+    @SuppressWarnings("SuspiciousNameCombination")
     private Path getStartArrowPath() {
-        return getPath(90);
+        return getPath(90, height, heightOffset, 0, (height / 2) + (width / 2));
     }
 }
