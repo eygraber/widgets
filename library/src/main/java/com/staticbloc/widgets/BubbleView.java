@@ -9,7 +9,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.view.ViewStub;
 import android.widget.LinearLayout;
 
 import java.lang.reflect.Constructor;
@@ -30,7 +30,7 @@ public final class BubbleView extends LinearLayout {
     private static final int DEFAULT_DECORATION_LOCATION = 4;
     private static final int INVALID_CONTENT_RESOURCE = -1;
 
-    private FrameLayout container;
+    private View content;
 
     private Decoration decoView;
 
@@ -50,10 +50,8 @@ public final class BubbleView extends LinearLayout {
     }
 
     private void init(AttributeSet attrs) throws ClassNotFoundException {
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        inflater.inflate(R.layout.bubble_view, this, true);
-
-        container = (FrameLayout) findViewById(R.id.bv_content);
+        LayoutInflater.from(getContext()).inflate(R.layout.bubble_view, this, true);
+        ViewStub contentStub = (ViewStub) findViewById(R.id.content_stub);
 
         String decorationViewFQName = null;
 
@@ -68,7 +66,6 @@ public final class BubbleView extends LinearLayout {
         Decoration.DecorationGravity decorationGravity = Decoration.DecorationGravity.TOP;
         Decoration.DecorationLocation decorationLocation = Decoration.DecorationLocation.CENTER;
 
-        int backgroundColor = Color.WHITE;
         int decorationColor = Color.WHITE;
 
         if (attrs != null) {
@@ -76,14 +73,12 @@ public final class BubbleView extends LinearLayout {
 
             contentResource = a.getResourceId(R.styleable.BubbleView_bv_content, INVALID_CONTENT_RESOURCE);
 
-            backgroundColor = a.getColor(R.styleable.BubbleView_bv_background_color, Color.WHITE);
-
             decorationViewFQName = a.getString(R.styleable.BubbleView_bv_decoration);
             if(TextUtils.isEmpty(decorationViewFQName)) {
                 decorationViewFQName = DEFAULT_DECORATION_CLASS;
             }
 
-            decorationColor = a.getColor(R.styleable.BubbleView_bv_decoration_color, backgroundColor);
+            decorationColor = a.getColor(R.styleable.BubbleView_bv_decoration_color, Color.WHITE);
 
             decorationWidth = (int) a.getDimension(R.styleable.BubbleView_bv_decoration_width, DEFAULT_DECORATION_MEASUREMENT);
             decorationHeight = (int) a.getDimension(R.styleable.BubbleView_bv_decoration_height, DEFAULT_DECORATION_MEASUREMENT);
@@ -98,10 +93,12 @@ public final class BubbleView extends LinearLayout {
         }
 
         if(contentResource != INVALID_CONTENT_RESOURCE) {
-            inflater.inflate(contentResource, container, true);
+            contentStub.setLayoutResource(contentResource);
+            content = contentStub.inflate();
         }
-
-        container.setBackgroundColor(backgroundColor);
+        else {
+            content = contentStub;
+        }
 
         Class<?> decoClass = Class.forName(decorationViewFQName);
         try {
@@ -197,11 +194,11 @@ public final class BubbleView extends LinearLayout {
     }
 
     private void setLayoutParamsAfterSettingGravity(float containerWeight, float decoWeight) {
-        LayoutParams containerLp = (LayoutParams) container.getLayoutParams();
+        LayoutParams contentLp = (LayoutParams) content.getLayoutParams();
         LayoutParams decoLp = (LayoutParams) decoView.getLayoutParams();
-        containerLp.weight = containerWeight;
+        contentLp.weight = containerWeight;
         decoLp.weight = decoWeight;
-        container.setLayoutParams(containerLp);
+        content.setLayoutParams(contentLp);
         decoView.setLayoutParams(decoLp);
     }
 

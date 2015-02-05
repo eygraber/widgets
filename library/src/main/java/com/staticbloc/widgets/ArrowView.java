@@ -3,6 +3,7 @@ package com.staticbloc.widgets;
 import android.content.Context;
 import android.graphics.*;
 import android.view.View;
+import android.view.ViewGroup;
 
 /**
  * Created with IntelliJ IDEA.
@@ -75,7 +76,18 @@ import android.view.View;
     }
 
     private View findSibling() {
-        return ((View) getParent()).findViewById(R.id.bv_content);
+        ViewGroup parent = (ViewGroup) getParent();
+
+        if(parent != null) {
+          for(int i = 0; i < parent.getChildCount(); i++) {
+            View child = parent.getChildAt(i);
+            if(child != null && child != parent && child != this) {
+              return child;
+            }
+          }
+        }
+
+        return null;
     }
 
     private void calculateHorizontalOffsets() {
