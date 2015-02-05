@@ -9,7 +9,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewStub;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import java.lang.reflect.Constructor;
@@ -30,7 +30,7 @@ public final class BubbleView extends LinearLayout {
     private static final int DEFAULT_DECORATION_LOCATION = 4;
     private static final int INVALID_CONTENT_RESOURCE = -1;
 
-    private View container;
+    private FrameLayout container;
 
     private Decoration decoView;
 
@@ -50,8 +50,10 @@ public final class BubbleView extends LinearLayout {
     }
 
     private void init(AttributeSet attrs) throws ClassNotFoundException {
-        LayoutInflater.from(getContext()).inflate(R.layout.bubble_view, this, true);
-        ViewStub contentStub = (ViewStub) findViewById(R.id.content_stub);
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        inflater.inflate(R.layout.bubble_view, this, true);
+
+        container = (FrameLayout) findViewById(R.id.bv_content);
 
         String decorationViewFQName = null;
 
@@ -96,13 +98,8 @@ public final class BubbleView extends LinearLayout {
         }
 
         if(contentResource != INVALID_CONTENT_RESOURCE) {
-            contentStub.setLayoutResource(contentResource);
-            container = contentStub.inflate();
+            inflater.inflate(contentResource, container, true);
         }
-        else {
-            container = contentStub;
-        }
-        container.setId(R.id.bv_content);
 
         container.setBackgroundColor(backgroundColor);
 
