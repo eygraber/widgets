@@ -62,7 +62,7 @@ import android.view.ViewGroup;
             return;
         }
 
-        int measuredWidth = gravity.isHorizontal() ? findSibling().getMeasuredWidth() : getDecoWidth();
+        int measuredWidth = gravity.isHorizontal() ? findSibling().getMeasuredWidth() : getDecoHeight();
         int measuredHeight = gravity.isVertical() ? findSibling().getMeasuredHeight() : getDecoHeight();
 
         setMeasuredDimension(measuredWidth, measuredHeight);

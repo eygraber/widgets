@@ -210,26 +210,17 @@ public final class BubbleView extends LinearLayout {
         decoView.setLocation(decorationLocation);
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        int measuredWidth = content.getMeasuredWidth() + (decoView.getGravity().isVertical() ? decoView.getMeasuredWidth() : 0);
-        int measuredHeight = content.getMeasuredHeight() + (decoView.getGravity().isHorizontal() ? decoView.getMeasuredHeight() : 0);
-        setMeasuredDimension(measuredWidth, measuredHeight);
-    }
-
 //  for testing purposes
-//    @Override
-//    public void draw(Canvas canvas) {
-//        super.draw(canvas);
-//
-//        Paint red = new Paint();
-//        red.setColor(Color.RED);
-//
-//        canvas.drawLine(0, getMeasuredHeight() / 2, getMeasuredWidth(), getMeasuredHeight() / 2, red);
-//        canvas.drawLine(getMeasuredWidth() / 2, 0, getMeasuredWidth() / 2, getMeasuredHeight(), red);
-//    }
+    @Override
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
+
+        Paint red = new Paint();
+        red.setColor(Color.RED);
+
+        canvas.drawLine(0, getMeasuredHeight() / 2, getMeasuredWidth(), getMeasuredHeight() / 2, red);
+        canvas.drawLine(getMeasuredWidth() / 2, 0, getMeasuredWidth() / 2, getMeasuredHeight(), red);
+    }
 
     public abstract static class Decoration extends View {
         public static enum DecorationGravity {

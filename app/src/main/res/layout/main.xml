@@ -9,11 +9,12 @@
     <com.staticbloc.widgets.BubbleView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/test"
         app:bv_content="@layout/bubble_content"
         app:bv_decoration_color="#f00"
-        app:bv_decoration_width="20dp"
+        app:bv_decoration_width="50dp"
         app:bv_decoration_height="7.5dp"
-        app:bv_decoration_gravity="bottom"
+        app:bv_decoration_gravity="start"
         app:bv_decoration_location="center"/>
 
 </LinearLayout>
