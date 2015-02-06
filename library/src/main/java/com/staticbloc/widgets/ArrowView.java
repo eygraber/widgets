@@ -200,6 +200,6 @@ import android.view.ViewGroup;
 
     @SuppressWarnings("SuspiciousNameCombination")
     private Path getStartArrowPath() {
-        return getPath(90, getDecoWidth(), heightOffset, 0, (getDecoHeight() / 2) + (getDecoWidth() / 2));
+        return getPath(90, getDecoWidth() / 2, heightOffset + getDecoHeight() / 2, -(getDecoWidth() / 2 - getDecoHeight() / 2), 0);
     }
 }
