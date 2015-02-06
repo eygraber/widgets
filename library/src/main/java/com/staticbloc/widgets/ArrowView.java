@@ -1,7 +1,10 @@
 package com.staticbloc.widgets;
 
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Path;
+import android.graphics.Point;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -129,11 +132,11 @@ import android.view.ViewGroup;
                 break;
             case CENTER:
                 widthOffset = 0;
-                heightOffset = (siblingHeight / 2) - (getDecoHeight() / 2);
+                heightOffset = (siblingHeight / 2) - (getDecoWidth() / 2);
                 break;
             case END:
                 widthOffset = 0;
-                heightOffset = siblingHeight - getDecoHeight();
+                heightOffset = siblingHeight - getDecoWidth();
                 break;
         }
     }
@@ -155,7 +158,41 @@ import android.view.ViewGroup;
         }
     }
 
-    private Path getPath(float rotation, float pivotX, float pivotY, float postRotateTranslationX, float postRotateTranslationY) {
+    private Path getPath(Point a, Point b, Point c, Point d) {
+        Path path = new Path();
+        path.moveTo(a.x, a.y);
+        path.lineTo(b.x, b.y);
+        path.lineTo(c.x, c.y);
+        path.lineTo(d.x, d.y);
+
+        return path;
+    }
+
+    private Path getTopArrowPath() {
+        int widthEnd = widthOffset + getDecoWidth();
+        int heightEnd = heightOffset + getDecoHeight();
+
+        Point a = new Point(widthOffset, heightEnd);
+        Point b = new Point(((getDecoWidth() / 2) + widthOffset), heightOffset);
+        Point c = new Point(widthEnd, heightEnd);
+        Point d = new Point(widthOffset, heightEnd);
+
+        return getPath(a, b, c, d);
+    }
+
+    private Path getEndArrowPath() {
+        int widthEnd = widthOffset + getDecoHeight();
+        int heightEnd = heightOffset + getDecoWidth();
+
+        Point a = new Point(widthEnd, (getDecoWidth() / 2) + heightOffset);
+        Point b = new Point(widthOffset, heightEnd);
+        Point c = new Point(widthOffset, heightOffset);
+        Point d = new Point(widthEnd, (getDecoWidth() / 2) + heightOffset);
+
+        return getPath(a, b, c, d);
+    }
+
+    private Path getBottomArrowPath() {
         int widthEnd = widthOffset + getDecoWidth();
         int heightEnd = heightOffset + getDecoHeight();
 
@@ -164,42 +201,18 @@ import android.view.ViewGroup;
         Point c = new Point(widthEnd, heightOffset);
         Point d = new Point(widthOffset, heightOffset);
 
-        Path path = new Path();
-        path.moveTo(a.x, a.y);
-        path.lineTo(b.x, b.y);
-        path.lineTo(c.x, c.y);
-        path.lineTo(d.x, d.y);
-
-        Matrix mMatrix = new Matrix();
-        RectF bounds = new RectF();
-        path.computeBounds(bounds, true);
-        mMatrix.postRotate(rotation, pivotX, pivotY);
-        if(getGravity().isHorizontal()) {
-            postRotateTranslationX += getStartMargin() - getEndMargin();
-        }
-        else {
-          postRotateTranslationY += getStartMargin() - getEndMargin();
-        }
-        mMatrix.postTranslate(postRotateTranslationX, postRotateTranslationY);
-        path.transform(mMatrix);
-
-        return path;
+        return getPath(a, b, c, d);
     }
 
-    private Path getTopArrowPath() {
-        return getPath(180, widthOffset + (getDecoWidth() / 2), getDecoHeight() / 2, 0, 0);
-    }
-
-    private Path getEndArrowPath() {
-        return getPath(270, 0, heightOffset, 0, (getDecoHeight() / 2) + (getDecoWidth() / 2));
-    }
-
-    private Path getBottomArrowPath() {
-        return getPath(0, widthOffset + (getDecoWidth() / 2), getDecoHeight() / 2, 0, 0);
-    }
-
-    @SuppressWarnings("SuspiciousNameCombination")
     private Path getStartArrowPath() {
-        return getPath(90, getDecoWidth() / 2, heightOffset + getDecoHeight() / 2, -(getDecoWidth() / 2 - getDecoHeight() / 2), 0);
+        int widthEnd = widthOffset + getDecoHeight();
+        int heightEnd = heightOffset + getDecoWidth();
+
+        Point a = new Point(widthOffset, (getDecoWidth() / 2) + heightOffset);
+        Point b = new Point(widthEnd, heightEnd);
+        Point c = new Point(widthEnd, heightOffset);
+        Point d = new Point(widthOffset, (getDecoWidth() / 2) + heightOffset);
+
+        return getPath(a, b, c, d);
     }
 }

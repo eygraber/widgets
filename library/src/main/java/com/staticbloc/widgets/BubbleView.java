@@ -211,16 +211,16 @@ public final class BubbleView extends LinearLayout {
     }
 
 //  for testing purposes
-    @Override
-    public void draw(Canvas canvas) {
-        super.draw(canvas);
-
-        Paint red = new Paint();
-        red.setColor(Color.RED);
-
-        canvas.drawLine(0, getMeasuredHeight() / 2, getMeasuredWidth(), getMeasuredHeight() / 2, red);
-        canvas.drawLine(getMeasuredWidth() / 2, 0, getMeasuredWidth() / 2, getMeasuredHeight(), red);
-    }
+//    @Override
+//    public void draw(Canvas canvas) {
+//        super.draw(canvas);
+//
+//        Paint red = new Paint();
+//        red.setColor(Color.RED);
+//
+//        canvas.drawLine(0, getMeasuredHeight() / 2, getMeasuredWidth(), getMeasuredHeight() / 2, red);
+//        canvas.drawLine(getMeasuredWidth() / 2, 0, getMeasuredWidth() / 2, getMeasuredHeight(), red);
+//    }
 
     public abstract static class Decoration extends View {
         public static enum DecorationGravity {
