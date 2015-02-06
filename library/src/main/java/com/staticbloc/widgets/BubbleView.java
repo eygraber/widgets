@@ -210,6 +210,15 @@ public final class BubbleView extends LinearLayout {
         decoView.setLocation(decorationLocation);
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int measuredWidth = content.getMeasuredWidth() + (decoView.getGravity().isVertical() ? decoView.getMeasuredWidth() : 0);
+        int measuredHeight = content.getMeasuredHeight() + (decoView.getGravity().isHorizontal() ? decoView.getMeasuredHeight() : 0);
+        setMeasuredDimension(measuredWidth, measuredHeight);
+    }
+
 //  for testing purposes
 //    @Override
 //    public void draw(Canvas canvas) {
