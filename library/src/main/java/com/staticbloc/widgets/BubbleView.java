@@ -188,16 +188,23 @@ public final class BubbleView extends LinearLayout {
                 break;
         }
 
-        setLayoutParamsAfterSettingGravity(.9f, .1f);
+        setLayoutParamsAfterSettingGravity(.9f, .1f, decorationGravity);
 
         decoView.setGravity(decorationGravity);
     }
 
-    private void setLayoutParamsAfterSettingGravity(float containerWeight, float decoWeight) {
+    private void setLayoutParamsAfterSettingGravity(float containerWeight, float decoWeight, Decoration.DecorationGravity gravity) {
         LayoutParams contentLp = (LayoutParams) content.getLayoutParams();
         LayoutParams decoLp = (LayoutParams) decoView.getLayoutParams();
         contentLp.weight = containerWeight;
         decoLp.weight = decoWeight;
+        if(gravity == Decoration.DecorationGravity.END) {
+            contentLp.width = LayoutParams.WRAP_CONTENT;
+        }
+        else if(gravity == Decoration.DecorationGravity.BOTTOM) {
+            decoLp.weight = 0;
+            decoLp.height = LayoutParams.WRAP_CONTENT;
+        }
         content.setLayoutParams(contentLp);
         decoView.setLayoutParams(decoLp);
     }
