@@ -55,7 +55,7 @@ import android.view.ViewGroup;
         if(!(adapterToDecorate instanceof ReorderableAdapter)) {
             throw new IllegalArgumentException("reorderable adapter must implement ReorderableAdapter or one of its subinterfaces");
         }
-        return new ReordererAdapterDecorator<VH>(adapterToDecorate, clipData);
+        return new ReordererAdapterDecorator<>(adapterToDecorate, clipData);
     }
 
     /**
@@ -65,7 +65,7 @@ import android.view.ViewGroup;
     /*package*/ void startReordering(int position) {
         mReorderPosition = position;
         mDropPosition = position;
-        decoratedAdapter.notifyItemChanged(position);
+        if(decoratedAdapter != null) decoratedAdapter.notifyItemChanged(position);
     }
 
     private boolean isReordering() {
@@ -85,7 +85,7 @@ import android.view.ViewGroup;
         }
 
         if(initialRangePosition == currentRangePosition) {
-            decoratedAdapter.notifyItemChanged(currentRangePosition);
+            if(decoratedAdapter != null) decoratedAdapter.notifyItemChanged(currentRangePosition);
             return;
         }
 
@@ -126,7 +126,7 @@ import android.view.ViewGroup;
 
             notifyPositionRangeChanged(oldDropPosition, mDropPosition);
             if(mDropPosition != INVALID) {
-                ((ReorderableAdapter) decoratedAdapter).onItemDropped(mReorderPosition, mDropPosition);
+                if(decoratedAdapter != null) ((ReorderableAdapter) decoratedAdapter).onItemDropped(mReorderPosition, mDropPosition);
                 notifyPositionRangeChanged(mReorderPosition, mDropPosition);
             }
             mReorderPosition = INVALID;
@@ -140,28 +140,25 @@ import android.view.ViewGroup;
         return true;
     }
 
-    public void clearWrappedAdapter() {
-        decoratedAdapter = null;
-        clipData = null;
-    }
-
     @Override
     public int getItemCount() {
-        return decoratedAdapter.getItemCount();
+        return decoratedAdapter == null ? 0 : decoratedAdapter.getItemCount();
     }
 
     @Override
     public long getItemId(int position) {
-        return decoratedAdapter.getItemId(position);
+        return decoratedAdapter == null ? 0 : decoratedAdapter.getItemId(position);
     }
 
     @Override
     public int getItemViewType(int position) {
-        return decoratedAdapter.getItemViewType(position);
+        return decoratedAdapter == null ? 0 : decoratedAdapter.getItemViewType(position);
     }
 
     @Override
     public void onBindViewHolder(VH holder, int position) {
+        if(decoratedAdapter == null) return;
+
         if(!isReordering()) { //if we're not reordering, don't do anything to the view (unless we have to undo the drop position decoration)
             decoratedAdapter.onBindViewHolder(holder, position);
             if(decoratedAdapter instanceof ReorderableAdapterViewDecorator) {
@@ -214,36 +211,36 @@ import android.view.ViewGroup;
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-        return decoratedAdapter.onCreateViewHolder(parent, viewType);
+        return decoratedAdapter == null ? null : decoratedAdapter.onCreateViewHolder(parent, viewType);
     }
 
     @Override
     public void onViewAttachedToWindow(VH holder) {
-        decoratedAdapter.onViewAttachedToWindow(holder);
+        if(decoratedAdapter != null) decoratedAdapter.onViewAttachedToWindow(holder);
     }
 
     @Override
     public void onViewDetachedFromWindow(VH holder) {
-        decoratedAdapter.onViewDetachedFromWindow(holder);
+        if(decoratedAdapter != null) decoratedAdapter.onViewDetachedFromWindow(holder);
     }
 
     @Override
     public void onViewRecycled(VH holder) {
-        decoratedAdapter.onViewRecycled(holder);
+        if(decoratedAdapter != null) decoratedAdapter.onViewRecycled(holder);
     }
 
     @Override
     public void registerAdapterDataObserver(RecyclerView.AdapterDataObserver observer) {
-        decoratedAdapter.registerAdapterDataObserver(observer);
+        if(decoratedAdapter != null) decoratedAdapter.registerAdapterDataObserver(observer);
     }
 
     @Override
     public void setHasStableIds(boolean hasStableIds) {
-        decoratedAdapter.setHasStableIds(hasStableIds);
+        if(decoratedAdapter != null) decoratedAdapter.setHasStableIds(hasStableIds);
     }
 
     @Override
     public void unregisterAdapterDataObserver(RecyclerView.AdapterDataObserver observer) {
-        decoratedAdapter.unregisterAdapterDataObserver(observer);
+        if(decoratedAdapter != null) decoratedAdapter.unregisterAdapterDataObserver(observer);
     }
 }

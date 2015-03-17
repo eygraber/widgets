@@ -87,15 +87,12 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
      * <br/>
      * <b>{@link android.support.v7.widget.RecyclerView#setAdapter} should not be called.</b>
      */
-    public void setAdapter(RecyclerView.Adapter adapter) {
+    public void setAdapter(RecyclerView.Adapter newAdapter) {
         if(recyclerView == null) throw new IllegalStateException("Can't set adapter if RecyclerView is not set");
 
-        if(this.adapter != null) {
-            this.adapter.clearWrappedAdapter();
-        }
-        this.adapter = ReordererAdapterDecorator.decorateAdapter(adapter, clipData);
+        adapter = ReordererAdapterDecorator.decorateAdapter(newAdapter, clipData);
 
-        recyclerView.setAdapter(this.adapter);
+        recyclerView.setAdapter(adapter);
     }
 
     /**
@@ -103,15 +100,12 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
      * <br/>
      * <b>{@link android.support.v7.widget.RecyclerView#swapAdapter} should not be called.</b>
      */
-    public void swapAdapter(RecyclerView.Adapter adapter, boolean removeAndRecycleExistingViews) {
+    public void swapAdapter(RecyclerView.Adapter adapterToSwap, boolean removeAndRecycleExistingViews) {
         if(recyclerView == null) throw new IllegalStateException("Can't set adapter if RecyclerView is not set");
 
-        if(this.adapter != null) {
-            this.adapter.clearWrappedAdapter();
-        }
-        this.adapter = ReordererAdapterDecorator.decorateAdapter(adapter, clipData);
+        adapter = ReordererAdapterDecorator.decorateAdapter(adapterToSwap, clipData);
 
-        recyclerView.swapAdapter(this.adapter, removeAndRecycleExistingViews);
+        recyclerView.swapAdapter(adapter, removeAndRecycleExistingViews);
     }
 
     /**
@@ -128,10 +122,6 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
         if(recyclerView != null) {
             recyclerView.setOnDragListener(null);
             recyclerView = null;
-        }
-        if(adapter != null) {
-            adapter.clearWrappedAdapter();
-            adapter = null;
         }
 
         clipData = null;
