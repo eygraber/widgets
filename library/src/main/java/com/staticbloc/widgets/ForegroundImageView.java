@@ -32,7 +32,7 @@ public class ForegroundImageView extends ImageView {
      * @param drawableResId The drawable resource to be drawn on top of the children.
      */
     public void setForegroundResource(int drawableResId) {
-        setForeground(getContext().getResources().getDrawable(drawableResId));
+        setForeground(getContext().getDrawable(drawableResId));
     }
 
     /**

@@ -113,7 +113,7 @@ import android.view.ViewGroup;
         if(e.getAction() == DragEvent.ACTION_DRAG_LOCATION) {
             int oldDropPosition = mDropPosition;
             if(holder != null) {
-                mDropPosition = holder.getPosition();
+                mDropPosition = holder.getLayoutPosition();
             }
 
             notifyPositionRangeChanged(oldDropPosition, mDropPosition);
@@ -121,7 +121,7 @@ import android.view.ViewGroup;
         else if(e.getAction() == DragEvent.ACTION_DROP) {
             int oldDropPosition = mDropPosition;
             if(holder != null) {
-                mDropPosition = holder.getPosition();
+                mDropPosition = holder.getLayoutPosition();
             }
 
             notifyPositionRangeChanged(oldDropPosition, mDropPosition);
@@ -156,6 +156,11 @@ import android.view.ViewGroup;
     }
 
     @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+      if(decoratedAdapter != null) decoratedAdapter.onAttachedToRecyclerView(recyclerView);
+    }
+
+    @Override
     public void onBindViewHolder(VH holder, int position) {
         if(decoratedAdapter == null) return;
 
@@ -170,7 +175,7 @@ import android.view.ViewGroup;
                 }
             }
         }
-        else if(holder.getPosition() == mDropPosition) { // if it's the drop position, apply the drop position decoration
+        else if(holder.getLayoutPosition() == mDropPosition) { // if it's the drop position, apply the drop position decoration
             decoratedAdapter.onBindViewHolder(holder, position);
             if(decoratedAdapter instanceof ReorderableAdapterViewDecorator) {
                 ((ReorderableAdapterViewDecorator) decoratedAdapter).applyDropPositionDecoration(holder.itemView);
@@ -212,6 +217,16 @@ import android.view.ViewGroup;
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
         return decoratedAdapter == null ? null : decoratedAdapter.onCreateViewHolder(parent, viewType);
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        if(decoratedAdapter != null) decoratedAdapter.onDetachedFromRecyclerView(recyclerView);
+    }
+
+    @Override
+    public boolean onFailedToRecycleView(VH holder) {
+        return decoratedAdapter != null && decoratedAdapter.onFailedToRecycleView(holder);
     }
 
     @Override

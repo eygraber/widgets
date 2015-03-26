@@ -48,6 +48,8 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
      *
      * @param orientation the orientation of the {@link android.support.v7.widget.RecyclerView.LayoutManager}
      * @param clipData its description's label will be used to make sure the dragged item is ours
+     *
+     * @throws java.lang.IllegalArgumentException if {@code clipData}, its description, or its description's label is {@code null}
      */
     public RecyclerViewReorderer(LayoutManagerOrientation orientation, ClipData clipData) {
         this(orientation, clipData, null);
@@ -58,6 +60,8 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
      * @param orientation the orientation of the {@link android.support.v7.widget.RecyclerView.LayoutManager}
      * @param clipData its description's label will be used to make sure the dragged item is ours
      * @param onReorderingListener can be null
+     *
+     * @throws java.lang.IllegalArgumentException if {@code clipData}, its description, or its description's label is {@code null}
      */
     public RecyclerViewReorderer(LayoutManagerOrientation orientation, ClipData clipData, OnReorderingListener onReorderingListener) {
         this.orientation = orientation;
@@ -75,6 +79,8 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
      *
      * This {@link android.support.v7.widget.RecyclerView}'s {@link android.support.v7.widget.RecyclerView.Adapter} will be set in those calls,
      * so there is no need to set them on the {@code RecyclerView} itself.
+     *
+     * @throws java.lang.IllegalArgumentException if {@code recyclerView} is {@code null}
      */
     public void setRecyclerView(DraggableRecyclerView recyclerView) {
         if(recyclerView == null) throw new IllegalArgumentException("RecyclerView cannot be null");
@@ -86,6 +92,8 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
      * This will set the {@link android.support.v7.widget.RecyclerView.Adapter} on the underlying {@link android.support.v7.widget.RecyclerView}.
      * <br/>
      * <b>{@link android.support.v7.widget.RecyclerView#setAdapter} should not be called.</b>
+     *
+     * @throws java.lang.IllegalStateException if {@link RecyclerViewReorderer#setRecyclerView} has not been called
      */
     public void setAdapter(RecyclerView.Adapter newAdapter) {
         if(recyclerView == null) throw new IllegalStateException("Can't set adapter if RecyclerView is not set");
@@ -99,6 +107,8 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
      * This will swap the {@link android.support.v7.widget.RecyclerView.Adapter} on the underlying {@link android.support.v7.widget.RecyclerView}.
      * <br/>
      * <b>{@link android.support.v7.widget.RecyclerView#swapAdapter} should not be called.</b>
+     *
+     * @throws java.lang.IllegalStateException if {@link RecyclerViewReorderer#setRecyclerView} has not been called
      */
     public void swapAdapter(RecyclerView.Adapter adapterToSwap, boolean removeAndRecycleExistingViews) {
         if(recyclerView == null) throw new IllegalStateException("Can't set adapter if RecyclerView is not set");
@@ -113,19 +123,6 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
      */
     public void setOrientation(LayoutManagerOrientation orientation) {
         this.orientation = orientation;
-    }
-
-    /**
-     * This method does not necessarily need to be called, but it can help with potential memory leaks.
-     */
-    public void release() {
-        if(recyclerView != null) {
-            recyclerView.setOnDragListener(null);
-            recyclerView = null;
-        }
-
-        clipData = null;
-        onReorderingListener = null;
     }
 
     /**
@@ -150,10 +147,10 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
         return onDrag(null, ev);
     }
 
-    private Handler scrollHandler = new Handler();
+    private final Handler scrollHandler = new Handler();
     private int scrollDistance;
     private boolean isScrolling = false;
-    private Runnable scrollRunnable = new Runnable() {
+    private final Runnable scrollRunnable = new Runnable() {
         @Override
         public void run() {
             if(isScrolling) {
@@ -224,13 +221,13 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
             View viewAtCurrentPosition = recyclerView.findChildViewUnder(ev.getX(), ev.getY());
             if(viewAtCurrentPosition != null) {
                 // and get its position
-                int currentPosition = recyclerView.getChildPosition(viewAtCurrentPosition);
+                int currentPosition = recyclerView.getChildLayoutPosition(viewAtCurrentPosition);
                 // this is an optimization so that we don't keep sending the same ViewHolder to the adapter
                 // for every pixel that it moves (which would be redundant anyway)
                 if(currentPosition != lastKnownPosition) {
                     // if it's a valid position, use it to get the ViewHolder to send to the adapter
                     if(currentPosition != RecyclerView.NO_POSITION) {
-                        viewHolderToSendToAdapter = recyclerView.findViewHolderForPosition(currentPosition);
+                        viewHolderToSendToAdapter = recyclerView.findViewHolderForLayoutPosition(currentPosition);
                     }
                     // this position is now our known position
                     lastKnownPosition = currentPosition;
@@ -249,10 +246,10 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
             View viewAtCurrentPosition = recyclerView.findChildViewUnder(ev.getX(), ev.getY());
             if(viewAtCurrentPosition != null) {
                 // and get its position
-                int currentPosition = recyclerView.getChildPosition(viewAtCurrentPosition);
+                int currentPosition = recyclerView.getChildLayoutPosition(viewAtCurrentPosition);
                 // if it's a valid position, use it to get the ViewHolder to send to the adapter
                 if(currentPosition != RecyclerView.NO_POSITION) {
-                    viewHolderToSendToAdapter = recyclerView.findViewHolderForPosition(currentPosition);
+                    viewHolderToSendToAdapter = recyclerView.findViewHolderForLayoutPosition(currentPosition);
                 }
             }
             // reset our last known position since we dropped
@@ -288,6 +285,10 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
         }
     }
 
+  /**
+   *
+   * @param position should always be the layout position, <b>NOT</b> the adapter position
+   */
     public boolean startReorder(int position) {
         if(isReordering()) {
             throw new IllegalStateException("Cannot start reordering if a reordering operation is already in progress");
@@ -302,7 +303,7 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
         // TODO: custom DragShadowBuilder
 
         View.DragShadowBuilder dragShadowBuilder;
-        View viewAtReorderPosition = recyclerView.findViewHolderForPosition(position).itemView;
+        View viewAtReorderPosition = recyclerView.findViewHolderForLayoutPosition(position).itemView;
         dragShadowBuilder = new View.DragShadowBuilder(viewAtReorderPosition);
 
         boolean success = recyclerView.startDrag(clipData, dragShadowBuilder, null, 0);

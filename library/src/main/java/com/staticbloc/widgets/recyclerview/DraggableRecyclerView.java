@@ -39,9 +39,9 @@ public interface DraggableRecyclerView {
 
     public View findChildViewUnder(float x, float y);
 
-    public int getChildPosition(View view);
+    public int getChildLayoutPosition(View view);
 
-    public RecyclerView.ViewHolder findViewHolderForPosition(int position);
+    public RecyclerView.ViewHolder findViewHolderForLayoutPosition(int position);
 
     public boolean startDrag(ClipData data, View.DragShadowBuilder shadowBuilder, Object myLocalState, int flags);
 }
