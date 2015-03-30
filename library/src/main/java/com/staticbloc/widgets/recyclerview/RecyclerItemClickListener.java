@@ -51,9 +51,8 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
                 View childView = recyclerView.findChildViewUnder(e.getX(), e.getY());
 
                 if(childView != null && mListener != null) {
-                    if(childView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)) {
-                        mListener.onItemLongClick(childView, recyclerView.getChildAdapterPosition(childView), recyclerView.getChildLayoutPosition(childView));
-                    }
+                    childView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                    mListener.onItemLongClick(childView, recyclerView.getChildAdapterPosition(childView), recyclerView.getChildLayoutPosition(childView));
                 }
             }
         });
