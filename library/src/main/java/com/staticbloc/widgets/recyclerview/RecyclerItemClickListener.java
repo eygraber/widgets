@@ -17,10 +17,15 @@ import android.view.View;
  */
 public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
     public static interface OnItemClickListener {
-        public void onItemClick(View view, int adapterPosition, int layoutPosition);
+        /**
+         * If {@code true} is returned {@link View#playSoundEffect(int)} will be called
+         * @return {@code true} if handled, otherwise {@code false}
+         */
+        public boolean onItemClick(View view, int adapterPosition, int layoutPosition);
 
       /**
-       * 
+       * If {@code true} is returned and haptic feedback is enabled on the device
+       * {@link View#performHapticFeedback(int)} will be called
        * @return {@code true} if handled, otherwise {@code false}
        */
         public boolean onItemLongClick(View view, int adapterPosition, int layoutPosition);
@@ -28,7 +33,9 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
 
     public static class OnItemClickAdapter implements OnItemClickListener {
         @Override
-        public void onItemClick(View view, int adapterPosition, int layoutPosition) {}
+        public boolean onItemClick(View view, int adapterPosition, int layoutPosition) {
+            return false;
+        }
 
         @Override
         public boolean onItemLongClick(View view, int adapterPosition, int layoutPosition) { return false; }
@@ -51,8 +58,9 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
                 View childView = recyclerView.findChildViewUnder(e.getX(), e.getY());
 
                 if(childView != null && mListener != null) {
-                    childView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                    mListener.onItemLongClick(childView, recyclerView.getChildAdapterPosition(childView), recyclerView.getChildLayoutPosition(childView));
+                    if(mListener.onItemLongClick(childView, recyclerView.getChildAdapterPosition(childView), recyclerView.getChildLayoutPosition(childView))) {
+                        childView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                    }
                 }
             }
         });
@@ -63,8 +71,9 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
         View childView = view.findChildViewUnder(e.getX(), e.getY());
 
         if(childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-            childView.playSoundEffect(SoundEffectConstants.CLICK);
-            mListener.onItemClick(childView, view.getChildAdapterPosition(childView), view.getChildLayoutPosition(childView));
+            if(mListener.onItemClick(childView, view.getChildAdapterPosition(childView), view.getChildLayoutPosition(childView))) {
+                childView.playSoundEffect(SoundEffectConstants.CLICK);
+            }
         }
 
         return false;
