@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipDescription;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
 import android.widget.AbsListView;
@@ -290,8 +291,13 @@ public final class RecyclerViewReorderer implements View.OnDragListener {
    * @param position should always be the layout position, <b>NOT</b> the adapter position
    */
     public boolean startReorder(int position) {
+        if(recyclerView == null) {
+            Log.e("RecyclerViewReorderer", "Can't reorder without a recycler view");
+            return false;
+        }
         if(isReordering()) {
-            throw new IllegalStateException("Cannot start reordering if a reordering operation is already in progress");
+            Log.e("RecyclerViewReorderer", "Cannot start reordering if a reordering operation is already in progress");
+            return false;
         }
         if(recyclerView.getAdapter() == null) {
             throw new IllegalStateException("Cannot start a reorder operation if there is no adapter set");
