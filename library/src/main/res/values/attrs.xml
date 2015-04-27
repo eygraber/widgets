@@ -25,4 +25,16 @@
         <attr name="bv_decoration_margin_end" format="dimension"/>
         <attr name="bv_content" format="reference"/>
     </declare-styleable>
+
+    <declare-styleable name="SeekBarPreference">
+        <attr name="android:max" />
+        <attr name="android:defaultValue" />
+        <attr name="android:padding" />
+        <attr name="android:paddingStart" />
+        <attr name="android:paddingLeft" />
+        <attr name="android:paddingTop" />
+        <attr name="android:paddingEnd" />
+        <attr name="android:paddingRight" />
+        <attr name="android:paddingBottom" />
+    </declare-styleable>
 </resources>
