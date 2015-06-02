@@ -180,11 +180,13 @@ public final class BubbleView extends LinearLayout {
                 setOrientation(HORIZONTAL);
                 addView(decoView, 0);
                 measure(1, 1);
+                measureChild(content, MeasureSpec.makeMeasureSpec(1, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(1, MeasureSpec.UNSPECIFIED));
                 break;
             case END:
                 setOrientation(HORIZONTAL);
                 addView(decoView, 1);
                 measure(1, 1);
+                measureChild(content, MeasureSpec.makeMeasureSpec(1, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(1, MeasureSpec.UNSPECIFIED));
                 break;
         }
 
