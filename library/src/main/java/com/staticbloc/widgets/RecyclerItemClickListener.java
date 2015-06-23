@@ -1,4 +1,4 @@
-package com.staticbloc.widgets.recyclerview;
+package com.staticbloc.widgets;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
